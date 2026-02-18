@@ -9,11 +9,12 @@ class Environment:
 
     def screenshot(self):
         with mss() as sct:
-            return sct.shot()
+            monitor = sct.monitors[1]
+            return sct.grab(monitor)
 
     def send(self, action):
-        if action == ">":
-            return np.array(self.screenshot())
+        if action:
+            return cv2.cvtColor(np.array(self.screenshot()), cv2.COLOR_BGRA2BGR)
 
     def show_picture(self, img):
         cv2.imshow("OpenCV/Numpy normal", img)
@@ -25,4 +26,11 @@ class Environment:
 
 if __name__ == "__main__":
     e = Environment()
-    e.show_picture(e.send(e.screenshot()))
+    while True:
+        e.show_picture(e.send(e.screenshot()))
+
+        # REQUIRED for window refresh
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cv2.destroyAllWindows()
