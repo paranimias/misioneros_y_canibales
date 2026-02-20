@@ -1,5 +1,4 @@
 from collections import deque
-import numpy as np
 from pyautogui import click
 import time
 
@@ -81,15 +80,14 @@ class Agent:
             if tuple(perception[row][column]) == color:
                 action()
         time.sleep(2)
-        self.actual_coordinates = self.calculate_actual_coordinates()
         self.initial_state = self.calculate_initial_state()
         # 1. Calculate_actual_state
         # 2. Agregar una flag (while flag)
         return "*"
     
-    def calculate_side(self, type: str):
-        self.calculate_actual_coordinates()
-        if type == "B":
+    def calculate_side(self, nombre):
+        self.calculate_actual_coordinates(self.all_coordinates)
+        if nombre == "B":
             boat_coordinates = self.actual_coordinates["B"]
             if boat_coordinates[1] > 950:
                 return boat_coordinates + ("R")
@@ -97,11 +95,11 @@ class Agent:
                 return boat_coordinates + ("L")
 
         triplas = []
-        for (row, column) in self.actual_coordinates[type]:
+        for (row, column) in self.actual_coordinates[nombre]:
             if column > 950:
-                triplas.append(row,column,"R")
+                triplas.append((row,column,"R"))
             elif column < 950:
-                triplas.append(row,column,"L")
+                triplas.append((row,column,"L"))
         return triplas
 
     def validate(self, state: State):
@@ -141,17 +139,16 @@ class Agent:
 
     def calculate_initial_state(self) -> State:
         # Calcular el lado del bote
-        state = (0,0,0)
-        if self.calculate_side["B"] == "R":
-            state[2] = 1
+        if self.calculate_side("B")[2] == "R":
+            b = 1
         else:
-            state[2] = 0
+            b = 0
         # Calcular el cuantos canibales están a la derecha
-        state[0] = sum(1 for canibal in self.actual_coordinates["C"] if "R" in canibal)
+        c = sum(1 for canibal in self.actual_coordinates["C"] if "R" in canibal)
         # Calcular el cuantos misioneros están a la derecha
-        state[1] = sum(1 for misionero in self.actual_coordinates["M"] if "R" in misionero)
+        m = sum(1 for misionero in self.actual_coordinates["M"] if "R" in misionero)
         # Retornamos un estado
-        return State(*state)
+        return State(c,m,b)
 
     def calculate_nexts_steps(self, state: State):
         children = []
