@@ -34,34 +34,41 @@ class Agent:
         # y sabremos qué posiciones son (fila, columna) del array de pixeles
         # si registramos la (fila, columna) y las colocamos en actual_coordinates,
         self.all_coordinates = [
+            # Lado derecho
             (387, 1645), # Canibal1, fijo
             (470, 1504), # Canibal2, fijo
             (722, 1645), # Canibal3, fijo
             (559, 1601), # Misionero1, fijo
             (790, 1476), # Misionero2, fijo
             (930, 1637), # Misionero3, fijo
-            # Revisar en paint
-            (),
-            (),
-            (),
-            (),
-            (),
-            (),
+            # Lado izquierdo
+            #   1.
+            #     2.
+            #   6.  3.
+            #     4.
+            #   5.
+            (380,365), # 1.
+            (452,488), # 2.
+            (559,603), # 3.
+            (623,454), # 4.
+            (737,315), # 5.
+            # la posición 6 solo se usa cuando ganamos
+            # (),
         ]
-        actual_coordinates = {
+        self.actual_coordinates = {
             "M" : [],
             "C" : [],
-
+            "B" : (),
         }
 
         # actual_coordinates = {
         #   "M" : [(fila,columna),(fila,columna),(fila,columna)],
         #   "C" : [(fila,columna),(fila,columna),(fila,columna)]
+        #   "B" : (fila,columna)
         # }
 
         self.initial_state = State(3, 3, 1)
         self.final_state = State(0, 0, 0)
-        self.actual_state = State(3, 3, 1)
 
         # Cuantos van en el bote (misioneros,canibales)
         self.movements = [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)]
@@ -77,6 +84,22 @@ class Agent:
         #actual_state_var = self.calculate_actual_state(perception)
         #self.calculate_nexts_steps(actual_state_var)
         return "*"
+    
+    def calculate_side(self, type: str):
+        if type == "B":
+            boat_coordinates = self.actual_coordinates["B"]
+            if boat_coordinates[1] > 950:
+                return boat_coordinates + ("R")
+            else:
+                return boat_coordinates + ("L")
+
+        triplas = []
+        for (row, column) in self.actual_coordinates[type]:
+            if column > 950:
+                triplas.append(row,column,"R")
+            elif column < 950:
+                triplas.append(row,column,"L")
+        return triplas
 
     def validate(self, state: State):
         can_r = state.can
@@ -92,16 +115,39 @@ class Agent:
 
         else:
             return True
+    
+    def calculate_actual_coordinates(self, arr):
+        self.actual_coordinates = {
+            "M" : [],
+            "C" : [],
+            "B" : (),
+        }
+        for (row, column) in self.all_coordinates:
+            # Es ese pixel del color de un canibal?
+            if tuple(arr[row][column]) == (24 ,93 ,160):
+                self.actual_coordinates["C"].append((row,column))
+            # Es del color de un misionero?
+            elif tuple(arr[row][column]) == (157,178,255):
+                self.actual_coordinates["M"].append((row,column))
+        # Es menos azul, o sea es café
+        if tuple(arr[950][650])[0] < 80:
+            self.actual_coordinates["B"] = (950,650)
+        else:
+            self.actual_coordinates["B"] = (960,1191)
+        return self.actual_coordinates
 
-    def calculate_actual_state(self, p) -> State:
-        # Esto deberia 
+
+
+    def calculate_initial_state(self) -> State:
         state = State(0,0,0)
-        for (row, column), color in self.coordinates:
-            if tuple(p[row][column]) == color and color == (157,178,255):
-                # Probablemente haya una mejor forma de no tener el "M" o "C"
-                state.mis += 1
-            elif tuple(p[row][column]) == color and color == (24,93,160):
-                state.can += 1
+        # Calcular el lado del bote
+        if self.calculate_side["B"] == "R":
+            state.boat = 1
+        else:
+            state.boat = 0
+        # Calcular el cuantos misioneros están a la derecha
+        state.mis = sum(1 for misionero in self.actual_coordinates["M"] if "R" in misionero)
+        state.mis = sum(1 for canibal in self.actual_coordinates["C"] if "R" in canibal)
         return state
 
     def calculate_nexts_steps(self, state: State):
@@ -143,17 +189,3 @@ class Agent:
                         visited.add(child)
                         new_way = way + [actual_state]
                         orden_queue.append((child, new_way))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
