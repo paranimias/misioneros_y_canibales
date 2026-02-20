@@ -30,20 +30,12 @@ class Agent:
             ((210,978), (0  , 56 , 223), lambda: click(x=946, y=658)),
             ((200,943), (0  , 255, 255), lambda: click(x=945, y=891)),
         ]
-        self.coordinates = [
-            # Aqui coloco las coordenadas de cada uno de los sprites de la derecha, luego contamos cuantos
-            # están y cuantos no
-            ((559, 1601), (157,178,255)),
-            ((790, 1476), (157,178,255)),
-            ((930, 1637), (157,178,255)),
-            ((387, 1645), (24,93,160)),
-            ((470, 1504), (24,93,160)),
-            ((722, 1645), (24,93,160)),
-            # Puede que aquí pueda poner las coordenadas del otro lado, puedo colocar que si la columna que estoy
-            # revisando es menor a la mitad de la pantalla entonces. ¿Cómo guardaremos la posicion de cada uno de
-            # los sprites?
-        ]
-        # TODO: ¿Por qué se inicializa con esas variables, se supone que no las sabemos
+
+        # actual_coordinates = {
+        #   "M" = [(),(),()],
+        #   "C" = [(),().()]
+        # }
+
         self.initial_state = State(3, 3, 1)
         self.final_state = State(0, 0, 0)
         self.actual_state = State(3, 3, 1)
@@ -59,8 +51,8 @@ class Agent:
                 return "*"
         # Calculamos el estado actual y lo asignamos a la variable actual_state ¿Debería cambiar el atributo por
         # este return?
-        actual_state_var = self.calculate_actual_state(perception)
-        self.calculate_nexts_steps(actual_state_var)
+        #actual_state_var = self.calculate_actual_state(perception)
+        #self.calculate_nexts_steps(actual_state_var)
         return "*"
 
     def validate(self, state: State):
@@ -79,8 +71,9 @@ class Agent:
             return True
 
     def calculate_actual_state(self, p) -> State:
+        # Esto deberia 
         state = State(0,0,0)
-        for (row, column), color, tipo in self.coordinates:
+        for (row, column), color in self.coordinates:
             if tuple(p[row][column]) == color and color == (157,178,255):
                 # Probablemente haya una mejor forma de no tener el "M" o "C"
                 state.mis += 1
