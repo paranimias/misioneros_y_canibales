@@ -1,6 +1,7 @@
 from collections import deque
 import numpy as np
 from pyautogui import click
+import time
 
 
 class State:
@@ -26,9 +27,9 @@ class Agent:
     def __init__(self):
         # Estas son las reglas para iniciar el juego
         self.rules = [
-            ((465,905), (102, 205, 255), lambda: click(x=540, y=960)),
-            ((210,978), (0  , 56 , 223), lambda: click(x=946, y=658)),
-            ((200,943), (0  , 255, 255), lambda: click(x=945, y=891)),
+            ((465, 905), (102, 205, 255), lambda: click(x=540, y=960)),
+            ((210, 978), (0, 56, 223), lambda: click(x=946, y=658)),
+            ((200, 943), (0, 255, 255), lambda: click(x=945, y=891)),
         ]
         # lo más sencillo sería iterar toda la lista de 12 posiciones cada vez que vayamos a revisar un screenshot,
         # y sabremos qué posiciones son (fila, columna) del array de pixeles
@@ -81,8 +82,8 @@ class Agent:
                 return "*"
         # Calculamos el estado actual y lo asignamos a la variable actual_state ¿Debería cambiar el atributo por
         # este return?
-        #actual_state_var = self.calculate_actual_state(perception)
-        #self.calculate_nexts_steps(actual_state_var)
+        # actual_state_var = self.calculate_actual_state(perception)
+        # self.calculate_nexts_steps(actual_state_var)
         return "*"
     
     def calculate_side(self, type: str):
@@ -137,7 +138,6 @@ class Agent:
         return self.actual_coordinates
 
 
-
     def calculate_initial_state(self) -> State:
         state = State(0,0,0)
         # Calcular el lado del bote
@@ -176,16 +176,72 @@ class Agent:
 
     def find_way(self):
         orden_queue = deque([(self.initial_state, [])])
+        orden_queue = deque([(self.initial_state, [(self.initial_state, None)])])
         visited = set([self.initial_state])
 
         while orden_queue:
             actual_state, way = orden_queue.popleft()
+
             if actual_state == self.final_state:
-                way.append(actual_state)
                 return way
+
             else:
-                for child, actions in self.calculate_nexts_steps(actual_state):
+                for child, action in self.calculate_nexts_steps(actual_state):
                     if child not in visited:
                         visited.add(child)
-                        new_way = way + [actual_state]
+                        new_way = way + [(child, action)]
                         orden_queue.append((child, new_way))
+
+
+    def execute_movement(self, action):
+        delta_mis, delta_can = action
+
+        boat_y, boat_x, boat_side = self.calculate_side("B")
+
+        mis_can_move = []
+        for i in self.calculate_side("M"):
+            if boat_side == i[2]:
+                mis_can_move.append((i[0], i[1]))
+
+        can_can_move = []  # Canibales que puedo mover can that I can move
+        for i in self.calculate_side("C"):
+            if boat_side == i[2]:
+                can_can_move.append((i[0], i[1]))
+
+        if len(mis_can_move) < delta_mis:
+            print("mis_can_move < delta_mis")
+            return False
+
+        if len(can_can_move) < delta_can:
+            print("can_can_move < delta_can")
+            return False
+
+        for i in range(delta_mis):
+            y, x = mis_can_move[i]
+            click(x, y)
+            time.sleep(0.5)
+
+        for i in range(delta_can):
+            y, x = can_can_move[i]
+            click(x, y)
+            time.sleep(0.5)
+
+        click(boat_x, boat_y)
+        time.sleep(0.5)
+        return True
+
+    def execute_solution(self) -> bool:
+        way = self.find_way()
+        if not way:
+            return False
+
+        for i in range(1, len(way)):
+            state, action = way[i]
+            sucess = self.execute_movement(action)
+            time.sleep(0.5)
+
+            if not sucess:
+                print("Fallo en los movimientos")
+                return False
+
+        return True
