@@ -1,5 +1,6 @@
 from collections import deque
 import numpy as np
+from pyautogui import click
 
 
 class State:
@@ -29,6 +30,18 @@ class Agent:
 
         # Cuantos van en el bote (misioneros,canibales)
         self.movements = [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)]
+
+    def compute(self, perception):
+        if np.array_equal(perception[465][905], np.array([102, 205, 255])):
+            click(x=540, y=960)
+            return "*"
+        elif np.array_equal(perception[210][978], np.array([0, 56, 223])):
+            click(x=946,y=658)
+            return "*"
+        elif np.array_equal(perception[200][943], np.array([0, 255, 255])):
+            click(x=945,y=891)
+            return "*"
+        return "*"
 
     def validate(self, state: State):
         can_r = state.can
