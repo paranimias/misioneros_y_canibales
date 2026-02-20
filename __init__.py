@@ -1,6 +1,5 @@
 if __name__ == "__main__":
     # a = Agent()
-    # e = Environment(a)
     #
     imagen_transformada = e.send(e.screenshot())
     # print(type(imagen_transformada[1079][950]))
