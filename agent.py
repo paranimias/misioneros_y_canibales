@@ -68,7 +68,8 @@ class Agent:
         #   "B" : (fila,columna)
         # }
 
-        self.initial_state = State(3, 3, 1)
+        # Usamos el método calculate_initial_state para conseguir el atributo initial_state
+        self.initial_state = self.calculate_initial_state
         self.final_state = State(0, 0, 0)
 
         # Cuantos van en el bote (misioneros,canibales)
@@ -80,10 +81,6 @@ class Agent:
             if tuple(perception[row][column]) == color:
                 action()
                 return "*"
-        # Calculamos el estado actual y lo asignamos a la variable actual_state ¿Debería cambiar el atributo por
-        # este return?
-        # actual_state_var = self.calculate_actual_state(perception)
-        # self.calculate_nexts_steps(actual_state_var)
         return "*"
     
     def calculate_side(self, type: str):
@@ -139,16 +136,18 @@ class Agent:
 
 
     def calculate_initial_state(self) -> State:
-        state = State(0,0,0)
         # Calcular el lado del bote
+        state = (0,0,0)
         if self.calculate_side["B"] == "R":
-            state.boat = 1
+            state[2] = 1
         else:
-            state.boat = 0
+            state[2] = 0
+        # Calcular el cuantos canibales están a la derecha
+        state[0] = sum(1 for canibal in self.actual_coordinates["C"] if "R" in canibal)
         # Calcular el cuantos misioneros están a la derecha
-        state.mis = sum(1 for misionero in self.actual_coordinates["M"] if "R" in misionero)
-        state.mis = sum(1 for canibal in self.actual_coordinates["C"] if "R" in canibal)
-        return state
+        state[1] = sum(1 for misionero in self.actual_coordinates["M"] if "R" in misionero)
+        # Retornamos un estado
+        return State(*state)
 
     def calculate_nexts_steps(self, state: State):
         children = []
