@@ -30,10 +30,33 @@ class Agent:
             ((210,978), (0  , 56 , 223), lambda: click(x=946, y=658)),
             ((200,943), (0  , 255, 255), lambda: click(x=945, y=891)),
         ]
+        # lo más sencillo sería iterar toda la lista de 12 posiciones cada vez que vayamos a revisar un screenshot,
+        # y sabremos qué posiciones son (fila, columna) del array de pixeles
+        # si registramos la (fila, columna) y las colocamos en actual_coordinates,
+        self.all_coordinates = [
+            (387, 1645), # Canibal1, fijo
+            (470, 1504), # Canibal2, fijo
+            (722, 1645), # Canibal3, fijo
+            (559, 1601), # Misionero1, fijo
+            (790, 1476), # Misionero2, fijo
+            (930, 1637), # Misionero3, fijo
+            # Revisar en paint
+            (),
+            (),
+            (),
+            (),
+            (),
+            (),
+        ]
+        actual_coordinates = {
+            "M" : [],
+            "C" : [],
+
+        }
 
         # actual_coordinates = {
-        #   "M" = [(),(),()],
-        #   "C" = [(),().()]
+        #   "M" : [(fila,columna),(fila,columna),(fila,columna)],
+        #   "C" : [(fila,columna),(fila,columna),(fila,columna)]
         # }
 
         self.initial_state = State(3, 3, 1)
@@ -120,3 +143,17 @@ class Agent:
                         visited.add(child)
                         new_way = way + [actual_state]
                         orden_queue.append((child, new_way))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
