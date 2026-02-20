@@ -189,7 +189,7 @@ class Agent:
     def execute_solution(self) -> bool:
         way = self.find_way()
         if not way:
-            return
+            return False
 
         for i in range(1, len(way)):
             state, action = way[i]
@@ -200,5 +200,4 @@ class Agent:
                 print("Fallo en los movimientos")
                 return False
 
-            else:
-                return True
+        return True
