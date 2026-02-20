@@ -90,7 +90,7 @@ class Agent:
             if not flag:
                 print("Error en ejecucion, volviendo a ejecutar")
 
-        return "*"
+        return "^"
 
     def calculate_side(self, nombre):
         self.calculate_actual_coordinates(self.all_coordinates)
