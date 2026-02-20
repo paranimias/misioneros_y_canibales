@@ -69,7 +69,7 @@ class Agent:
         # }
 
         # Usamos el método calculate_initial_state para conseguir el atributo initial_state
-        self.initial_state = self.calculate_initial_state
+        self.initial_state = None
         self.final_state = State(0, 0, 0)
 
         # Cuantos van en el bote (misioneros,canibales)
@@ -80,10 +80,15 @@ class Agent:
         for (row, column), color, action in self.rules:
             if tuple(perception[row][column]) == color:
                 action()
-                return "*"
+        time.sleep(2)
+        self.actual_coordinates = self.calculate_actual_coordinates()
+        self.initial_state = self.calculate_initial_state()
+        # 1. Calculate_actual_state
+        # 2. Agregar una flag (while flag)
         return "*"
     
     def calculate_side(self, type: str):
+        self.calculate_actual_coordinates()
         if type == "B":
             boat_coordinates = self.actual_coordinates["B"]
             if boat_coordinates[1] > 950:
@@ -132,7 +137,6 @@ class Agent:
             self.actual_coordinates["B"] = (950,650)
         else:
             self.actual_coordinates["B"] = (960,1191)
-        return self.actual_coordinates
 
 
     def calculate_initial_state(self) -> State:
@@ -174,7 +178,6 @@ class Agent:
         return children
 
     def find_way(self):
-        orden_queue = deque([(self.initial_state, [])])
         orden_queue = deque([(self.initial_state, [(self.initial_state, None)])])
         visited = set([self.initial_state])
 
