@@ -1,8 +1,24 @@
+from collections import deque
+import numpy as np
+
+
 class State:
     def __init__(self, mis, can, boat) -> None:
         self.mis = mis
         self.can = can
         self.boat = boat
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, State):
+            return (
+                self.mis == other.mis
+                and self.can == other.can
+                and self.boat == other.boat
+            )
+        return False
+
+    def __hash__(self):
+        return hash((self.mis, self.can, self.boat))
 
 
 class Agent:
@@ -32,13 +48,11 @@ class Agent:
     def calculate_actual_state(self) -> State:
         return State(0, 0, 0)
 
-    def calculate_nexts_steps(self):
-        self.actual_state = self.calculate_actual_state()
-        childrens = []
-
-        can_r = self.actual_state.can
-        mis_r = self.actual_state.mis
-        boat = self.actual_state.boat
+    def calculate_nexts_steps(self, state: State):
+        children = []
+        can_r = state.can
+        mis_r = state.mis
+        boat = state.boat
 
         # Sumamos al lado izquierdo y restamos para el lado derecho
         if boat == 1:
@@ -54,6 +68,22 @@ class Agent:
             new_state = State(new_mis, new_can, new_boat)
 
             if self.validate(new_state):
-                childrens.append((new_state, (delta_mis, delta_can)))
+                children.append((new_state, (delta_mis, delta_can)))
 
-        return childrens
+        return children
+
+    def find_way(self):
+        orden_queue = deque([(self.initial_state, [])])
+        visited = set([self.initial_state])
+
+        while orden_queue:
+            actual_state, way = orden_queue.popleft()
+            if actual_state == self.final_state:
+                way.append(actual_state)
+                return way
+            else:
+                for child, actions in self.calculate_nexts_steps(actual_state):
+                    if child not in visited:
+                        visited.add(child)
+                        new_way = way + [actual_state]
+                        orden_queue.append((child, new_way))

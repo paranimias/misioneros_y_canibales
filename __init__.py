@@ -1,11 +1,14 @@
-if __name__ == "__main__":
-    # a = Agent()
-    #
-    imagen_transformada = e.send(e.screenshot())
-    # print(type(imagen_transformada[1079][950]))
-    e.show_picture(imagen_transformada)
-    while True:
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+import agent
+import Enviroment
 
-    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    e = Enviroment()
+    e.iniciar()
+#    a = Agent()
+#    r = e.response("*")
+#    while True:
+#        v = a.compute(r)
+#        if v == "^"
+#            break
+#        r = e.response(v)
