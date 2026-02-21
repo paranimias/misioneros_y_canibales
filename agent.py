@@ -24,41 +24,35 @@ class State:
 
 class Agent:
     def __init__(self):
-        # Estas son las reglas para iniciar el juego
-        self.rules = [
-            ((465, 905), (102, 205, 255), lambda: click(x=540, y=960)),
-            ((210, 978), (0, 56, 223), lambda: click(x=946, y=658)),
-            ((200, 943), (0, 255, 255), lambda: click(x=945, y=891)),
-        ]
         # lo más sencillo sería iterar toda la lista de 12 posiciones cada vez que vayamos a revisar un screenshot,
         # y sabremos qué posiciones son (fila, columna) del array de pixeles
         # si registramos la (fila, columna) y las colocamos en actual_coordinates,
         self.all_coordinates = [
             # Lado derecho
-            (387, 1645), # Canibal1, fijo
-            (470, 1504), # Canibal2, fijo
-            (722, 1645), # Canibal3, fijo
-            (559, 1601), # Misionero1, fijo
-            (790, 1476), # Misionero2, fijo
-            (930, 1637), # Misionero3, fijo
+            (387, 1645),  # Canibal1, fijo
+            (470, 1504),  # Canibal2, fijo
+            (722, 1645),  # Canibal3, fijo
+            (559, 1601),  # Misionero1, fijo
+            (790, 1476),  # Misionero2, fijo
+            (930, 1637),  # Misionero3, fijo
             # Lado izquierdo
             #   1.
             #     2.
             #   6.  3.
             #     4.
             #   5.
-            (380,365), # 1.
-            (452,488), # 2.
-            (559,603), # 3.
-            (623,454), # 4.
-            (737,315), # 5.
+            (380, 365),  # 1.
+            (452, 488),  # 2.
+            (559, 603),  # 3.
+            (623, 454),  # 4.
+            (737, 315),  # 5.
             # la posición 6 solo se usa cuando ganamos
             # (),
         ]
         self.actual_coordinates = {
-            "M" : [],
-            "C" : [],
-            "B" : (),
+            "M": [],
+            "C": [],
+            "B": (),
         }
 
         # actual_coordinates = {
@@ -75,16 +69,12 @@ class Agent:
         self.movements = [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)]
 
     def compute(self, perception):
-        # Primero recorremos los colores del inicio del juego
-        for (row, column), color, action in self.rules:
-            if tuple(perception[row][column]) == color:
-                action()
         time.sleep(2)
         self.initial_state = self.calculate_initial_state()
         # 1. Calculate_actual_state
         # 2. Agregar una flag (while flag)
         return "*"
-    
+
     def calculate_side(self, nombre):
         self.calculate_actual_coordinates(self.all_coordinates)
         if nombre == "B":
@@ -95,11 +85,11 @@ class Agent:
                 return boat_coordinates + ("L")
 
         triplas = []
-        for (row, column) in self.actual_coordinates[nombre]:
+        for row, column in self.actual_coordinates[nombre]:
             if column > 950:
-                triplas.append((row,column,"R"))
+                triplas.append((row, column, "R"))
             elif column < 950:
-                triplas.append((row,column,"L"))
+                triplas.append((row, column, "L"))
         return triplas
 
     def validate(self, state: State):
@@ -116,26 +106,25 @@ class Agent:
 
         else:
             return True
-    
+
     def calculate_actual_coordinates(self, arr):
         self.actual_coordinates = {
-            "M" : [],
-            "C" : [],
-            "B" : (),
+            "M": [],
+            "C": [],
+            "B": (),
         }
-        for (row, column) in self.all_coordinates:
+        for row, column in self.all_coordinates:
             # Es ese pixel del color de un canibal?
-            if tuple(arr[row][column]) == (24 ,93 ,160):
-                self.actual_coordinates["C"].append((row,column))
+            if tuple(arr[row][column]) == (24, 93, 160):
+                self.actual_coordinates["C"].append((row, column))
             # Es del color de un misionero?
-            elif tuple(arr[row][column]) == (157,178,255):
-                self.actual_coordinates["M"].append((row,column))
+            elif tuple(arr[row][column]) == (157, 178, 255):
+                self.actual_coordinates["M"].append((row, column))
         # Es menos azul, o sea es café
         if tuple(arr[950][650])[0] < 80:
-            self.actual_coordinates["B"] = (950,650)
+            self.actual_coordinates["B"] = (950, 650)
         else:
-            self.actual_coordinates["B"] = (960,1191)
-
+            self.actual_coordinates["B"] = (960, 1191)
 
     def calculate_initial_state(self) -> State:
         # Calcular el lado del bote
@@ -148,7 +137,7 @@ class Agent:
         # Calcular el cuantos misioneros están a la derecha
         m = sum(1 for misionero in self.actual_coordinates["M"] if "R" in misionero)
         # Retornamos un estado
-        return State(c,m,b)
+        return State(c, m, b)
 
     def calculate_nexts_steps(self, state: State):
         children = []
@@ -190,7 +179,6 @@ class Agent:
                         visited.add(child)
                         new_way = way + [(child, action)]
                         orden_queue.append((child, new_way))
-
 
     def execute_movement(self, action):
         delta_mis, delta_can = action
@@ -244,3 +232,4 @@ class Agent:
                 return False
 
         return True
+
