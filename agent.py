@@ -72,11 +72,16 @@ class Agent:
             "L": [(745, 545), (739, 654), (745, 763)],
             "R": [(745, 1045), (739, 1154), (745, 1263)]
         }
-
+# El objeto del environment puede ser pasado como argumento, de si pasarlo o heredar sus métodos parece más una conversación
+# de funcional vs POO
     def compute(self, env):
-        self.initial_state = State(3, 3, 1) 
         captura_inicial = env.screenshot()
+
         self.calculate_actual_coordinates(captura_inicial)
+
+        self.calculate_initial_state()
+
+        print((self.initial_state.mis, self.initial_state.can, self.initial_state.boat))
         
         succes = self.execute_solution(env)
         
@@ -88,7 +93,6 @@ class Agent:
         return succes
 
     def calculate_side(self, nombre):
-#         self.calculate_actual_coordinates(self.all_coordinates)
         if nombre == "B":
             boat_coordinates = self.actual_coordinates["B"]
             if boat_coordinates[1] > 950:
@@ -120,36 +124,35 @@ class Agent:
             return True
 
     def calculate_actual_coordinates(self, arr):
-        self.actual_coordinates = {
-            "M": [],
-            "C": [],
-            "B": (),
-        }
+        canibales = []
+        misioneros = []
         for row, column in self.all_coordinates:
             # Es ese pixel del color de un canibal?
             if tuple(arr[row][column]) == (24, 93, 160):
-                self.actual_coordinates["C"].append((row, column))
+                canibales.append((row,column))
             # Es del color de un misionero?
             elif tuple(arr[row][column]) == (157, 178, 255):
-                self.actual_coordinates["M"].append((row, column))
+                misioneros.append((row,column))
+        self.actual_coordinates["C"] = canibales
+        self.actual_coordinates["M"] = misioneros
         # Es menos azul, o sea es café
         if tuple(arr[950][650])[0] < 80:
             self.actual_coordinates["B"] = (950, 650)
         else:
             self.actual_coordinates["B"] = (960, 1191)
 
-    def calculate_initial_state(self) -> State:
+    def calculate_initial_state(self):
         # Calcular el lado del bote
         if self.calculate_side("B")[2] == "R":
             b = 1
         else:
             b = 0
         # Calcular el cuantos canibales están a la derecha
-        c = sum(1 for canibal in self.actual_coordinates["C"] if "R" in canibal)
+        c = sum(1 for right in self.calculate_side("C") if right[2] == "R")
         # Calcular el cuantos misioneros están a la derecha
-        m = sum(1 for misionero in self.actual_coordinates["M"] if "R" in misionero)
-        # Retornamos un estado
-        return State(c, m, b)
+        m = sum(1 for right in self.calculate_side("M") if right[2] == "R")
+        # Ya no retornamos un estado, cambiamos el atributo
+        self.initial_state = State(m, c, b)
 
     def calculate_nexts_steps(self, state: State):
         children = []
@@ -219,24 +222,24 @@ class Agent:
             y, x = mis_can_move[i]
             moveTo(x,y)
             click()
-            time.sleep(0.5)
+            # time.sleep(0.5)
 
         for i in range(delta_can):
             y, x = can_can_move[i]
             moveTo(x,y)
             click()
-            time.sleep(0.5)
+            # time.sleep(0.5)
 
         moveTo(boat_x, boat_y)
         click()
-        time.sleep(1.5)
+        time.sleep(0.5)
 
         destination_side = "L" if boat_side == "R" else "R"
         for y, x in self.unload_coordinates[destination_side]:
             moveTo(x, y)
             click()
-            time.sleep(0.1)
-        time.sleep(0.5) 
+            # time.sleep(0.1)
+        # time.sleep(0.5) 
         return True
     def execute_solution(self, env=None) -> bool:
         way = self.find_way()
@@ -245,15 +248,14 @@ class Agent:
 
         for i in range(1, len(way)):
             
-            state, action = way[i]
+            action = way[i][1]
             if env is not None:
-                # Pequeña pausa para asegurar que terminaron las animaciones del juego
-                time.sleep(0.5) 
+                # time.sleep(0.5) 
                 nueva_captura = env.screenshot()
                 self.calculate_actual_coordinates(nueva_captura)
 
             sucess = self.execute_movement(action)
-            time.sleep(0.5)
+            # time.sleep(0.5)
 
             if not sucess:
                 print("Fallo en los movimientos")

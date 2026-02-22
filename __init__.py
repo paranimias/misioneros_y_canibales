@@ -11,6 +11,6 @@ if __name__ == "__main__":
     while not game_started:
         captura = e.screenshot()
         game_started = e.start_game(captura)
-        time.sleep(1)
-    time.sleep(0.5)
+        time.sleep(0.5)
+#     time.sleep(5)
     a.compute(e)
