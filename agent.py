@@ -1,5 +1,5 @@
 from collections import deque
-from pyautogui import click
+from pyautogui import click, moveTo
 import time
 
 
@@ -24,12 +24,6 @@ class State:
 
 class Agent:
     def __init__(self):
-        # Estas son las reglas para iniciar el juego
-        self.rules = [
-            ((465, 905), (102, 205, 255), lambda: click(x=540, y=960)),
-            ((210, 978), (0, 56, 223), lambda: click(x=946, y=658)),
-            ((200, 943), (0, 255, 255), lambda: click(x=945, y=891)),
-        ]
         # lo más sencillo sería iterar toda la lista de 12 posiciones cada vez que vayamos a revisar un screenshot,
         # y sabremos qué posiciones son (fila, columna) del array de pixeles
         # si registramos la (fila, columna) y las colocamos en actual_coordinates,
@@ -52,8 +46,12 @@ class Agent:
             (559, 603),  # 3.
             (623, 454),  # 4.
             (737, 315),  # 5.
+<<<<<<< HEAD
             # la posición 6 solo se usa cuando ganamos
             # (),
+=======
+            (560, 280),  # 6.
+>>>>>>> testing
         ]
         self.actual_coordinates = {
             "M": [],
@@ -68,18 +66,21 @@ class Agent:
         # }
 
         # Usamos el método calculate_initial_state para conseguir el atributo initial_state
-        self.initial_state = None
+        # No se puede dejar como None porque nos da error si la pasamos a calculate_next_steps
+        self.initial_state = State(0,0,0)
         self.final_state = State(0, 0, 0)
 
         # Cuantos van en el bote (misioneros,canibales)
         self.movements = [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)]
 
+        self.unload_coordinates = {
+            "L": [(745, 545), (739, 654), (745, 763)],
+            "R": [(745, 1045), (739, 1154), (745, 1263)]
+        }
+
     def compute(self, perception):
-        # Primero recorremos los colores del inicio del juego
-        for (row, column), color, action in self.rules:
-            if tuple(perception[row][column]) == color:
-                action()
         time.sleep(2)
+<<<<<<< HEAD
 
         flag = False
 
@@ -91,15 +92,28 @@ class Agent:
                 print("Error en ejecucion, volviendo a ejecutar")
 
         return "^"
+=======
+        # Lo primero que hacemos es calcular la posición actual
+        self.calculate_actual_coordinates(perception)
+        
+        # Test para saber si los está calculando o no
+        print(self.calculate_side("M"))
+        print(self.calculate_side("C"))
+        print(self.calculate_side("B"))
+        # self.initial_state = self.calculate_initial_state()
+        # 1. Calculate_actual_state
+        # 2. Agregar una flag (while flag)
+        return "*"
+>>>>>>> testing
 
     def calculate_side(self, nombre):
-        self.calculate_actual_coordinates(self.all_coordinates)
+#         self.calculate_actual_coordinates(self.all_coordinates)
         if nombre == "B":
             boat_coordinates = self.actual_coordinates["B"]
             if boat_coordinates[1] > 950:
-                return boat_coordinates + ("R")
+                return boat_coordinates + ("R",)
             else:
-                return boat_coordinates + ("L")
+                return boat_coordinates + ("L",)
 
         triplas = []
         for row, column in self.actual_coordinates[nombre]:
@@ -224,25 +238,41 @@ class Agent:
 
         for i in range(delta_mis):
             y, x = mis_can_move[i]
-            click(x, y)
+            moveTo(x,y)
+            click()
             time.sleep(0.5)
 
         for i in range(delta_can):
             y, x = can_can_move[i]
-            click(x, y)
+            moveTo(x,y)
+            click()
             time.sleep(0.5)
 
-        click(boat_x, boat_y)
-        time.sleep(0.5)
-        return True
+        moveTo(boat_x, boat_y)#Necesita dos clicks no se porque xd
+        click()
+        time.sleep(1.5)
 
-    def execute_solution(self) -> bool:
+        destination_side = "L" if boat_side == "R" else "R"
+        for y, x in self.unload_coordinates[destination_side]:
+            moveTo(x, y)
+            click()
+            time.sleep(0.1)
+        time.sleep(0.5) 
+        return True
+    def execute_solution(self, env=None) -> bool:
         way = self.find_way()
         if not way:
             return False
 
         for i in range(1, len(way)):
+            
             state, action = way[i]
+            if env is not None:
+                # Pequeña pausa para asegurar que terminaron las animaciones del juego
+                time.sleep(0.5) 
+                nueva_captura = env.screenshot()
+                self.calculate_actual_coordinates(nueva_captura)
+
             sucess = self.execute_movement(action)
             time.sleep(0.5)
 
@@ -251,3 +281,7 @@ class Agent:
                 return False
 
         return True
+<<<<<<< HEAD
+=======
+
+>>>>>>> testing
