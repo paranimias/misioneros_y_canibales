@@ -46,12 +46,7 @@ class Agent:
             (559, 603),  # 3.
             (623, 454),  # 4.
             (737, 315),  # 5.
-<<<<<<< HEAD
-            # la posición 6 solo se usa cuando ganamos
-            # (),
-=======
             (560, 280),  # 6.
->>>>>>> testing
         ]
         self.actual_coordinates = {
             "M": [],
@@ -78,33 +73,19 @@ class Agent:
             "R": [(745, 1045), (739, 1154), (745, 1263)]
         }
 
-    def compute(self, perception):
-        time.sleep(2)
-<<<<<<< HEAD
-
-        flag = False
-
-        while not flag:
-            self.calculate_actual_coordinates(perception)
-            self.initial_state = self.calculate_initial_state()
-            flag = self.execute_solution()
-            if not flag:
-                print("Error en ejecucion, volviendo a ejecutar")
-
-        return "^"
-=======
-        # Lo primero que hacemos es calcular la posición actual
-        self.calculate_actual_coordinates(perception)
+    def compute(self, env):
+        self.initial_state = State(3, 3, 1) 
+        captura_inicial = env.screenshot()
+        self.calculate_actual_coordinates(captura_inicial)
         
-        # Test para saber si los está calculando o no
-        print(self.calculate_side("M"))
-        print(self.calculate_side("C"))
-        print(self.calculate_side("B"))
-        # self.initial_state = self.calculate_initial_state()
-        # 1. Calculate_actual_state
-        # 2. Agregar una flag (while flag)
-        return "*"
->>>>>>> testing
+        succes = self.execute_solution(env)
+        
+        if succes:
+            print("Juego terminado")
+        else:
+            print("Problemas")
+            
+        return succes
 
     def calculate_side(self, nombre):
 #         self.calculate_actual_coordinates(self.all_coordinates)
@@ -195,11 +176,9 @@ class Agent:
         return children
 
     def find_way(self):
-        if self.initial_state is None:
-            return None
-
         orden_queue = deque([(self.initial_state, [(self.initial_state, None)])])
         visited = set([self.initial_state])
+
         while orden_queue:
             actual_state, way = orden_queue.popleft()
 
@@ -248,7 +227,7 @@ class Agent:
             click()
             time.sleep(0.5)
 
-        moveTo(boat_x, boat_y)#Necesita dos clicks no se porque xd
+        moveTo(boat_x, boat_y)
         click()
         time.sleep(1.5)
 
@@ -281,7 +260,4 @@ class Agent:
                 return False
 
         return True
-<<<<<<< HEAD
-=======
 
->>>>>>> testing
