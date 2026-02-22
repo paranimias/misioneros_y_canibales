@@ -8,15 +8,15 @@ if __name__ == "__main__":
     a = agent.Agent()
     game_started = False
     while not game_started:
-        game_started = e.start_game()
+        captura = e.screenshot()
+        game_started = e.start_game(captura)
         start = time.time()
         time.sleep(2)
         elapsed = time.time() - start
         time.sleep(max(0, 1 - elapsed))
-    time.sleep(2)
+    print("El juego empezó")
+    time.sleep(1)
     r = e.response("*")  # Esto es un array de pixeles
-    print(r)
-    # while r:
-    #     v = a.compute(r)  # Por el momento esto sólo está retornando "*"
-    #     r = e.response(v)
-
+    while r is not False:
+        v = a.compute(r)  # Por el momento esto sólo está retornando "*"
+        r = e.response(v)

@@ -46,8 +46,7 @@ class Agent:
             (559, 603),  # 3.
             (623, 454),  # 4.
             (737, 315),  # 5.
-            # la posición 6 solo se usa cuando ganamos
-            # (),
+            (560, 280),  # 6.
         ]
         self.actual_coordinates = {
             "M": [],
@@ -62,7 +61,8 @@ class Agent:
         # }
 
         # Usamos el método calculate_initial_state para conseguir el atributo initial_state
-        self.initial_state = None
+        # No se puede dejar como None porque nos da error si la pasamos a calculate_next_steps
+        self.initial_state = State(0,0,0)
         self.final_state = State(0, 0, 0)
 
         # Cuantos van en el bote (misioneros,canibales)
@@ -70,19 +70,26 @@ class Agent:
 
     def compute(self, perception):
         time.sleep(2)
-        self.initial_state = self.calculate_initial_state()
+        # Lo primero que hacemos es calcular la posición actual
+        self.calculate_actual_coordinates(perception)
+        
+        # Test para saber si los está calculando o no
+        print(self.calculate_side("M"))
+        print(self.calculate_side("C"))
+        print(self.calculate_side("B"))
+        # self.initial_state = self.calculate_initial_state()
         # 1. Calculate_actual_state
         # 2. Agregar una flag (while flag)
         return "*"
 
     def calculate_side(self, nombre):
-        self.calculate_actual_coordinates(self.all_coordinates)
+#         self.calculate_actual_coordinates(self.all_coordinates)
         if nombre == "B":
             boat_coordinates = self.actual_coordinates["B"]
             if boat_coordinates[1] > 950:
-                return boat_coordinates + ("R")
+                return boat_coordinates + ("R",)
             else:
-                return boat_coordinates + ("L")
+                return boat_coordinates + ("L",)
 
         triplas = []
         for row, column in self.actual_coordinates[nombre]:
