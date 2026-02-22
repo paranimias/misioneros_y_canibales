@@ -1,5 +1,5 @@
 from collections import deque
-from pyautogui import click
+from pyautogui import click, moveTo
 import time
 
 
@@ -67,6 +67,11 @@ class Agent:
 
         # Cuantos van en el bote (misioneros,canibales)
         self.movements = [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)]
+
+        self.unload_coordinates = {
+            "L": [(745, 545), (739, 654), (745, 763)],
+            "R": [(745, 1045), (739, 1154), (745, 1263)]
+        }
 
     def compute(self, perception):
         time.sleep(2)
@@ -212,25 +217,41 @@ class Agent:
 
         for i in range(delta_mis):
             y, x = mis_can_move[i]
-            click(x, y)
+            moveTo(x,y)
+            click()
             time.sleep(0.5)
 
         for i in range(delta_can):
             y, x = can_can_move[i]
-            click(x, y)
+            moveTo(x,y)
+            click()
             time.sleep(0.5)
 
-        click(boat_x, boat_y)
-        time.sleep(0.5)
-        return True
+        moveTo(boat_x, boat_y)#Necesita dos clicks no se porque xd
+        click()
+        time.sleep(1.5)
 
-    def execute_solution(self) -> bool:
+        destination_side = "L" if boat_side == "R" else "R"
+        for y, x in self.unload_coordinates[destination_side]:
+            moveTo(x, y)
+            click()
+            time.sleep(0.1)
+        time.sleep(0.5) 
+        return True
+    def execute_solution(self, env=None) -> bool:
         way = self.find_way()
         if not way:
             return False
 
         for i in range(1, len(way)):
+            
             state, action = way[i]
+            if env is not None:
+                # Pequeña pausa para asegurar que terminaron las animaciones del juego
+                time.sleep(0.5) 
+                nueva_captura = env.screenshot()
+                self.calculate_actual_coordinates(nueva_captura)
+
             sucess = self.execute_movement(action)
             time.sleep(0.5)
 
