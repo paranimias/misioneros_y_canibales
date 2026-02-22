@@ -18,7 +18,7 @@ git clone https://github.com/paranimias/misioneros_y_canibales.git
 cd misioneros_y_canibales
 python -m venv .venv
 
-.venv/Scripts/activate.ps1 #En windows
+.venv/Scripts/Activate.ps1 #En windows
 source .venv/bin/activate #En linux
 ```
 
