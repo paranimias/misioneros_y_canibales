@@ -30,5 +30,6 @@ pip install -r requirements.txt
 
 4. Correr el programa
 ```bash
-python __init__.py
+python __init__.py 0 # Para iniciar el juego solo
+python __init__.py 1 # Para distintas condiciones iniciales
 ```
