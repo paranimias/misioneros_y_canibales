@@ -11,7 +11,7 @@ Programa para Introducción a los Sistemas Inteligentes 2026-1
 
 1. Clonar el repositorio
 ```bash
-git clone git@github.com:paranimias/misioneros_y_canibales.git
+git clone https://github.com/paranimias/misioneros_y_canibales.git
 ```
 
 2. Crear entorno virtual y activarlo
@@ -25,7 +25,7 @@ source .venv/bin/activate #En linux
 
 3. Instalar paquetes de requerimientos
 ```bash
-pip freeze > requirements.txt
+pip install -r requirements.txt
 ```
 
 4. Correr el programa
