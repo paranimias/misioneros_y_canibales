@@ -1,5 +1,12 @@
 Programa para Introducción a los Sistemas Inteligentes 2026-1
 
+Grupo: Los Gepetos
+
+Integrantes:
+  - Juan Esteban Huertas
+  - Nelson Daniel Celis
+  - Stephan Alain García
+
 # Requerimientos
 
 - [x] Python >3.10
